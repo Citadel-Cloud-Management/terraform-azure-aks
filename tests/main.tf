@@ -38,13 +38,13 @@ module "test" {
     }
   }
 
-  private_cluster_enabled          = true
-  enable_workload_identity         = true
-  enable_oidc_issuer               = true
-  enable_defender                  = false
-  enable_policy                    = false
+  private_cluster_enabled           = true
+  enable_workload_identity          = true
+  enable_oidc_issuer                = true
+  enable_defender                   = false
+  enable_policy                     = false
   enable_key_vault_secrets_provider = true
-  enable_image_cleaner             = true
+  enable_image_cleaner              = true
 
   tags = {
     Environment = "test"
