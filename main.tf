@@ -27,7 +27,7 @@ resource "azurerm_kubernetes_cluster" "this" {
     os_disk_type                 = var.default_node_pool.os_disk_type
     zones                        = var.default_node_pool.zones
     only_critical_addons_enabled = var.default_node_pool.only_critical_addons_enabled
-    enable_auto_scaling          = var.default_node_pool.min_count != null && var.default_node_pool.max_count != null
+    auto_scaling_enabled         = var.default_node_pool.min_count != null && var.default_node_pool.max_count != null
     vnet_subnet_id               = var.vnet_subnet_id
     temporary_name_for_rotation  = "${var.default_node_pool.name}tmp"
 
@@ -44,7 +44,7 @@ resource "azurerm_kubernetes_cluster" "this" {
     network_plugin      = var.network_plugin
     network_plugin_mode = var.network_plugin_mode
     network_policy      = var.network_policy
-    network_dataplane   = var.network_dataplane
+    network_data_plane  = var.network_dataplane
     load_balancer_sku   = "standard"
     outbound_type       = "loadBalancer"
     pod_cidr            = var.network_plugin_mode == "overlay" ? "10.244.0.0/16" : null
@@ -55,7 +55,6 @@ resource "azurerm_kubernetes_cluster" "this" {
   dynamic "azure_active_directory_role_based_access_control" {
     for_each = length(var.azure_ad_admin_group_object_ids) > 0 ? [1] : []
     content {
-      managed                = true
       azure_rbac_enabled     = true
       admin_group_object_ids = var.azure_ad_admin_group_object_ids
     }
@@ -88,6 +87,12 @@ resource "azurerm_kubernetes_cluster" "this" {
       secret_rotation_enabled  = true
       secret_rotation_interval = "2m"
     }
+  }
+
+  # Required block in azurerm 5.x. "Manual" keeps node pools user-managed (as
+  # this module does via default_node_pool and additional_node_pools).
+  node_provisioning_profile {
+    mode = "Manual"
   }
 
   storage_profile {
@@ -144,7 +149,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "this" {
   os_type               = each.value.os_type
   os_sku                = each.value.os_sku
   max_pods              = each.value.max_pods
-  enable_auto_scaling   = each.value.min_count != null && each.value.max_count != null
+  auto_scaling_enabled  = each.value.min_count != null && each.value.max_count != null
   vnet_subnet_id        = each.value.vnet_subnet_id
   node_labels           = each.value.node_labels
   node_taints           = each.value.node_taints
