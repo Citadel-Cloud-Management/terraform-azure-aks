@@ -76,12 +76,12 @@ module "aks" {
     }
   }
 
-  enable_workload_identity         = true
-  enable_oidc_issuer               = true
-  enable_defender                  = true
-  enable_policy                    = true
+  enable_workload_identity          = true
+  enable_oidc_issuer                = true
+  enable_defender                   = true
+  enable_policy                     = true
   enable_key_vault_secrets_provider = true
-  enable_image_cleaner             = true
+  enable_image_cleaner              = true
 
   log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
   acr_id                     = azurerm_container_registry.example.id
